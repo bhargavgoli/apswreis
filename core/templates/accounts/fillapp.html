@@ -1,0 +1,135 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} New Application {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">
+          Fill Application
+        </h4>
+      </div>
+      <div class="card-body">
+
+        <h6 class="card-category">
+          {% if msg %}
+          <span class="text-danger">{{ msg }}</span>
+          {% endif %}
+        </h6>
+
+        <br />
+
+        <form role="form" method="post" action="">
+
+          {% csrf_token %}
+
+          Application Ref No : 12345
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">First Name</label>
+                {{ form.firstname }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Last Name</label>
+                {{ form.lastname }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Email</label>
+                {{ form.email }}
+              </div>
+            </div>
+          </div>
+
+          <br />
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Employee Id</label>
+                {{ form.employeeId }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Phone No</label>
+                {{ form.phone }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Date Of Joining</label>
+                {{ form.doj }}
+              </div>
+            </div>
+          </div>
+
+          <br />
+
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">Marital Status</label>
+                {{ form.maritalstatus }}
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">Physical Disability</label>
+                {{ form.physical }}
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">Chronic Illness</label>
+                {{ form.chronicillness }}
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">Gender</label>
+                {{ form.gender }}
+              </div>
+            </div>
+          </div>
+
+          <br />
+
+          <button type="submit" name="save" class="btn btn-primary pull-left">SAVE</button>
+          <button type="submit" name="submit" class="btn btn-primary pull-left">SUBMIT</button>
+
+          <!-- &nbsp; &nbsp;
+          <span class="pull-right">
+            Don't have an account? <a href="{% url 'existapp' %}" class="text-primary">Create</a>
+          </span> -->
+
+          <div class="clearfix"></div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

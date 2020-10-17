@@ -9,7 +9,7 @@ from unipath import Path
 import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = Path(__file__).parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -19,18 +19,21 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=False)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',
+                 config('SERVER', default='127.0.0.1')]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'applications.apps.ApplicationsConfig',
+    'masters.apps.MastersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'  # Enable the inner app 
+    'app'  # Enable the inner app
 ]
 
 MIDDLEWARE = [
@@ -47,7 +50,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'core.urls'
 LOGIN_REDIRECT_URL = "home"   # Route defined in app/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
-TEMPLATE_DIR = os.path.join(BASE_DIR, "core/templates")  # ROOT dir for templates
+TEMPLATE_DIR = os.path.join(
+    BASE_DIR, "core/templates")  # ROOT dir for templates
 
 TEMPLATES = [
     {
@@ -72,8 +76,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'apsw',
+        'USER': 'root',
+        'PASSWORD': 'swarna@9',
+        'HOST': '3.6.239.36',
+        'PORT': '3306',
+        'CONN_MAX_AGE': 500
     }
 }
 
