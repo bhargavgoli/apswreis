@@ -65,9 +65,9 @@ class ApplicationForm(forms.Form):
             }
         ))
 
-    maritalstatus = forms.BooleanField(
+    maritalstatus = forms.CharField(
         widget=forms.Select(
-            choices=[('1', 'Single'), ('2', 'Married')],
+            choices=[('0', 'Single'), ('1', 'Married')],
             attrs={
                 "placeholder": "Marital Status",
                 "class": "form-control"
@@ -76,7 +76,7 @@ class ApplicationForm(forms.Form):
 
     physical = forms.CharField(
         widget=forms.Select(
-            choices=[('1', 'Yes'), ('2', 'No')],
+            choices=[('0', 'No'), ('1', 'Yes')],
             attrs={
                 "placeholder": "Physical Disability",
                 "class": "form-control"
@@ -108,7 +108,7 @@ class ExistApplicationForm(forms.Form):
             attrs={
                 "placeholder": "Email OTP",
                 "class": "form-control",
-                "disabled": True
+                "readonly": True
             }
         ))
 

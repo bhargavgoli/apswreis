@@ -17,6 +17,7 @@ class Application(models.Model):
     gender = models.CharField(max_length=6)
     status = models.CharField(default="Pending", max_length=25)
     points = models.IntegerField(default=0)
+    is_submitted = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         get_user_model(), related_name='user', on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now=True)

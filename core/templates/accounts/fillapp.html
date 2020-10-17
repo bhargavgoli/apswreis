@@ -29,7 +29,11 @@
 
           {% csrf_token %}
 
-          Application Ref No : 12345
+          Application Ref No : <b>{{uname}}</b>
+
+          <br />
+          <br />
+
 
           <div class="row">
             <div class="col-md-4">
@@ -113,7 +117,6 @@
 
           <br />
 
-          <button type="submit" name="save" class="btn btn-primary pull-left">SAVE</button>
           <button type="submit" name="submit" class="btn btn-primary pull-left">SUBMIT</button>
 
           <!-- &nbsp; &nbsp;
