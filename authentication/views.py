@@ -15,6 +15,7 @@ from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from .forms import ApplicationForm, SignUpForm, ExistApplicationForm
 from datetime import datetime
+from .sendmail import sendAppMail
 
 from applications.models import Application
 
@@ -98,6 +99,8 @@ def app_view(request):
                     created_by=user_ob
                 )
                 app.save()
+                sendAppMail(email, '{} {}'.format(
+                    firstName, lastName), app_ref)
                 msg = 'Application Submitted/Saved Successfully'
                 form = ApplicationForm()
         else:
