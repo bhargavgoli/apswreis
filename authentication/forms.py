@@ -258,7 +258,7 @@ class ExistApplicationForm(forms.Form):
     otp = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Email OTP",
+                "placeholder": "OTP",
                 "class": "form-control",
                 "readonly": True
             }
