@@ -22,6 +22,9 @@ class Application(models.Model):
         get_user_model(), related_name='user', on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return '{} - {} {}'.format(self.app_ref_no, self.first_name, self.last_name)
+
 
 class TransferAllotment(models.Model):
     school = models.ForeignKey(

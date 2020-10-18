@@ -7,6 +7,6 @@ def sendAppMail(to, name, refNo):
 
     text_content = 'Hey {}, We have received your request and your reference number is {}'.format(
         name, refNo)
-    send_mail('Hey '+name+', APSWREIS Reference No:'+refNo, text_content, 'no-reply@bhargavgoli.com',
+    send_mail('Hey '+name+', APSWREIS Reference No:'+refNo, text_content, 'info@bhargavgoli.com',
               [to], html_message=text_content, fail_silently=False)
     return True
