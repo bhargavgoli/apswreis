@@ -44,7 +44,7 @@ class ApplicationForm(forms.Form):
     employeeId = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Employee Id",
+                "placeholder": "Employee Code",
                 "class": "form-control"
             }
         ))
