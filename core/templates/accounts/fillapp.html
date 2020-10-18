@@ -6,26 +6,27 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<form role="form" method="post" action="">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">
+            Fill Application
+          </h4>
+        </div>
+        <div class="card-body">
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-header card-header-primary">
-        <h4 class="card-title">
-          Fill Application
-        </h4>
-      </div>
-      <div class="card-body">
+          <h6 class="card-category">
+            {% if msg %}
+            <span class="text-danger">{{ msg }}</span>
+            {% endif %}
+            {% if smsg %}
+            <span class="text-success">{{ smsg }}</span>
+            {% endif %}
+          </h6>
 
-        <h6 class="card-category">
-          {% if msg %}
-          <span class="text-danger">{{ msg }}</span>
-          {% endif %}
-        </h6>
-
-        <br />
-
-        <form role="form" method="post" action="">
+          <br />
 
           {% csrf_token %}
 
@@ -115,9 +116,19 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating">Current School</label>
+                {{ form.school }}
+              </div>
+            </div>
+          </div>
           <br />
 
-          <button type="submit" name="submit" class="btn btn-primary pull-left">SUBMIT</button>
+          {% if not success %}
+          <button type="submit" name="save" class="btn btn-primary pull-left">SUBMIT</button>
+          {% endif %}
 
           <!-- &nbsp; &nbsp;
           <span class="pull-right">
@@ -125,13 +136,90 @@
           </span> -->
 
           <div class="clearfix"></div>
-
-        </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">
+            Transfer Preferences
+          </h4>
+        </div>
+        <div class="card-body">
+
+          <h6 class="card-category">
+            {% if pemsg %}
+            <span class="text-danger">{{ pemsg }}</span>
+            {% endif %}
+
+            {% if pmsg %}
+            <span class="text-success">{{ pmsg }}</span>
+            {% endif %}
+          </h6>
+
+          <br />
+
+          <form role="form" method="post" action="" name="preference">
+
+            {% csrf_token %}
+
+            Application Ref No : <b>{{uname}}</b>
+
+            <br />
+            <br />
+
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Select School</label>
+                  {{ form.transferSchools }}
+                </div>
+              </div>
+            </div>
+
+
+            <br />
+            {% if not success %}
+            <button type="submit" name="addprefer" class="btn btn-primary pull-left">Add To Preferences</button>
+            {% endif %}
+            <br />
+            <br />
+            <table class="table table-hover">
+              <thead class="text-primary">
+                <th>School Name</th>
+                <th>Village</th>
+                <th>Mandal</th>
+              </thead>
+              <tbody>
+                {% for sch in selectedChoices %}
+                <tr>
+                  <td>{{sch.school_name}}</td>
+                  <td>{{sch.village}}</td>
+                  <td>{{sch.mandal}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+
+
+            <!-- &nbsp; &nbsp;
+          <span class="pull-right">
+            Don't have an account? <a href="{% url 'existapp' %}" class="text-primary">Create</a>
+          </span> -->
+
+            <div class="clearfix"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->

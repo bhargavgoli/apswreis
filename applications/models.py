@@ -22,6 +22,7 @@ class Application(models.Model):
     employee_id = models.CharField(max_length=100)
     phone_no = models.CharField(max_length=100)
     date_of_join = models.DateField(blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
     years_of_exp = models.IntegerField(default=0)
     marital_status = models.BooleanField(default=False)
     physical_disabled = models.BooleanField(default=False)
@@ -30,6 +31,8 @@ class Application(models.Model):
     status = models.CharField(default="Pending", max_length=25)
     points = models.IntegerField(default=0)
     is_submitted = models.BooleanField(default=False)
+    school = models.ForeignKey(
+        'masters.School', related_name='current_school', null=True, on_delete=models.DO_NOTHING)
     created_by = models.ForeignKey(
         get_user_model(), related_name='user', on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now=True)
@@ -56,4 +59,13 @@ class TransferAllotment(models.Model):
     application = models.ForeignKey(
         'applications.Application', related_name='application', on_delete=models.DO_NOTHING)
     points = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=True)
+
+
+class EmpPreferences(models.Model):
+    employee = models.ForeignKey(
+        'applications.Application', related_name='employee', on_delete=models.DO_NOTHING)
+    prefer_school = models.ForeignKey(
+        'masters.School', related_name='prefer_school', on_delete=models.DO_NOTHING)
+    prefernce_no = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now=True)

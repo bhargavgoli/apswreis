@@ -13,11 +13,19 @@
       <li class="nav-item {% if 'index' == segment %} active {% endif %}">
         <a rel="noopener noreferrer" class="nav-link" href="/">
           <i class="material-icons">unarchive</i>
-          <p>Applications</p>
+          <p>Employees</p>
         </a>
       </li>
-      <li class="nav-item {% if 'ui-transfers' in segment %} active {% endif %}">
-        <a rel="noopener noreferrer" class="nav-link" href="/ui-transfers.html">
+
+      <li class="nav-item {% if 'newapp' == segment %} active {% endif %}">
+        <a rel="noopener noreferrer" class="nav-link" href="/newapp">
+          <i class="material-icons">unarchive</i>
+          <p>Add Employee</p>
+        </a>
+      </li>
+
+      <li class="nav-item {% if 'transfers' in segment %} active {% endif %}">
+        <a rel="noopener noreferrer" class="nav-link" href="/transfers">
           <i class="material-icons">unarchive</i>
           <p>Transfers List</p>
         </a>
@@ -61,26 +69,26 @@
         </a>
       </li>
       {% else %}
-      <li class="nav-item active">
+      <!-- <li class="nav-item active">
         <a rel="noopener noreferrer" class="nav-link" href="/">
           <i class="material-icons">unarchive</i>
           <p>New Application</p>
         </a>
-      </li>
+      </li> -->
 
       <li class="nav-item active">
         <a rel="noopener noreferrer" class="nav-link" href="{% url 'existapp' %}">
           <i class="material-icons">unarchive</i>
-          <p>Edit/Submit Application</p>
+          <p>Review Application</p>
         </a>
       </li>
 
-      <li class="nav-item active">
+      <!-- <li class="nav-item active">
         <a rel="noopener noreferrer" class="nav-link" href="{% url 'preference' %}">
           <i class="material-icons">unarchive</i>
           <p>Select Your Preference</p>
         </a>
-      </li>
+      </li> -->
 
       <li class="nav-item active">
         <a rel="noopener noreferrer" class="nav-link" href="/admin/">

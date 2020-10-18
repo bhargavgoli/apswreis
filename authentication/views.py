@@ -13,11 +13,11 @@ from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
-from .forms import ApplicationForm, SignUpForm, ExistApplicationForm, LoginForm, ChoosePreferenceForm
+from .forms import ApplicationForm, SignUpForm, ExistApplicationForm, LoginForm, ChoosePreferenceForm, ApplicationFormFill
 from datetime import datetime, timedelta, date
 from .sendmail import sendAppMail
 
-from applications.models import Application, TransferAllotment
+from applications.models import Application, TransferAllotment, EmpPreferences
 from masters.models import School, SchoolCategory
 
 
@@ -41,6 +41,34 @@ def login_view(request):
             msg = 'Error validating the form'
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
+
+
+def getSchools(user):
+    schools = []
+    try:
+        emp = Application.objects.get(app_ref_no=user.username)
+        selectedSch = EmpPreferences.objects.filter(employee=emp)
+        prefers = []
+        for sch in selectedSch:
+            prefers.append(sch.prefer_school_id)
+        schools = School.objects.all().exclude(id__in=prefers)
+    except School.DoesNotExist:
+        pass
+    return schools
+
+
+def getSelectedSchools(user):
+    schools = []
+    try:
+        emp = Application.objects.get(app_ref_no=user.username)
+        selectedSch = EmpPreferences.objects.filter(employee=emp)
+        prefers = []
+        for sch in selectedSch:
+            prefers.append(sch.prefer_school_id)
+        schools = School.objects.filter(id__in=prefers)
+    except School.DoesNotExist:
+        pass
+    return schools
 
 
 def calculateExp(doj):
@@ -262,81 +290,91 @@ def app_view(request):
 
 @login_required(login_url='/existapp')
 def fill_app(request):
-
     msg = None
-    success = False
-
+    success = True
+    smsg = None
+    pmsg = None
+    pemsg = None
     if request.method == "POST":
-        form = ApplicationForm(request.POST)
+        form = ApplicationFormFill(request.POST)
         if form.is_valid():
-            firstName = form.cleaned_data.get("firstname")
-            lastName = form.cleaned_data.get("lastname")
-            gender = form.cleaned_data.get("gender")
-            employeeId = form.cleaned_data.get("employeeId")
-            phone = form.cleaned_data.get("phone")
-            doj = form.cleaned_data.get("doj")
-            maritalstatus = form.cleaned_data.get("maritalstatus")
-            physical = form.cleaned_data.get("physical")
-            chronicillness = form.cleaned_data.get("chronicillness")
-            email = form.cleaned_data.get("email")
-            status = 'Pending'
-            points = 0
-            try:
-                date_doj = datetime.strptime(doj, '%Y-%m-%d')
-                expYrs = calculateExp(date_doj)
-                if expYrs >= 8:
-                    points = 1
+            if 'save' in form.data:
+                firstName = form.cleaned_data.get("firstname")
+                lastName = form.cleaned_data.get("lastname")
+                gender = form.cleaned_data.get("gender")
+                employeeId = form.cleaned_data.get("employeeId")
+                phone = form.cleaned_data.get("phone")
+                doj = form.cleaned_data.get("doj")
+                maritalstatus = form.cleaned_data.get("maritalstatus")
+                physical = form.cleaned_data.get("physical")
+                chronicillness = form.cleaned_data.get("chronicillness")
+                email = form.cleaned_data.get("email")
+                status = 'Submitted'
+                try:
+                    app = Application.objects.get(
+                        app_ref_no=request.user.username)
                     print('{} {}'.format(maritalstatus, gender))
                     if maritalstatus == '0' and gender == '2':
-                        points += 5
+                        app.points += 5
                     if physical == '1':
-                        points += 10
-                    if chronicillness != '0':
-                        points += 1000  # This points is consider as the user can choose any location
-                else:
-                    status = 'NotEligible'
-                app = Application.objects.get(
-                    app_ref_no=request.user.username)
-                app.first_name = firstName
-                app.last_name = lastName
-                app.gender = gender
-                app.employee_id = employeeId
-                app.phone_no = phone
-                app.email = email
-                app.marital_status = True if maritalstatus == '1' else False
-                app.physical_disabled = True if physical == '1' else False
-                app.chronic_illness = chronicillness
-                app.points = points
-                app.status = status
-                app.is_submitted = True
-                app.save()
-                msg = "Application alredy submitted"
-            except Application.DoesNotExist:
-                msg = 'Application Not Found.'
+                        app.points += 10
+                    app.marital_status = True if maritalstatus == '1' else False
+                    app.physical_disabled = True if physical == '1' else False
+                    app.chronic_illness = chronicillness
+                    app.status = status
+                    app.is_submitted = True
+                    app.save()
+                    smsg = "Your prefeneces has been saved"
+                except Application.DoesNotExist:
+                    msg = 'Application Not Found.'
+            elif 'addprefer' in form.data:
+                try:
+                    app = Application.objects.get(
+                        app_ref_no=request.user.username)
+                except Application.DoesNotExist:
+                    app = None
+                selectedTransfer = form.cleaned_data.get('transferSchools')
+                print(selectedTransfer)
+                EmpPreferences(prefer_school_id=selectedTransfer,
+                               employee=app).save()
+                pmsg = "Preference Added Successfully!!"
 
-            return redirect("/logout/")
-        else:
-            msg = 'Form is not valid'
-    else:
-        try:
-            app = Application.objects.get(app_ref_no=request.user.username)
-        except Application.DoesNotExist:
-            app = None
+    try:
+        app = Application.objects.get(app_ref_no=request.user.username)
+    except Application.DoesNotExist:
+        app = None
 
-        form = ApplicationForm({
-            "firstname": app.first_name,
-            "lastname": app.last_name,
-            "email": app.email,
-            "gender": app.gender,
-            "employeeId": app.employee_id,
-            "phone": app.phone_no,
-            "doj": app.date_of_join,
-            "maritalstatus": app.marital_status,
-            "physical": app.physical_disabled,
-            "chronicillness": app.chronic_illness,
-        })
+    if app.is_submitted:
+        success = True
+        smsg = "You prefences are saved."
+        pmsg = "You prefences are saved."
 
-    return render(request, "accounts/fillapp.html", {"form": form, "msg": msg, "success": success, 'uname': request.user.username})
+    form = ApplicationFormFill(initial={
+        "firstname": app.first_name,
+        "lastname": app.last_name,
+        "email": app.email,
+        "gender": app.gender,
+        "employeeId": app.employee_id,
+        "phone": app.phone_no,
+        "doj": app.date_of_join,
+        "maritalstatus": app.marital_status,
+        "physical": app.physical_disabled,
+        "chronicillness": app.chronic_illness,
+        "school": app.school,
+        "transferSchools": []
+    })
+    selectedSchool = School.objects.get(id=app.school_id)
+    form.fields['school'].widget.choices = [
+        (selectedSchool.id, '{} - {}'.format(selectedSchool.school_name, selectedSchool.village))]
+    form.fields['gender'].widget.choices = [
+        (app.gender, 'Male' if app.gender == '1' else 'Female')]
+    choices = getSchools(request.user)
+    selectedChoices = getSelectedSchools(request.user)
+    c = []
+    for choice in choices:
+        c.append((choice.id, '{} - {}'.format(choice.school_name, choice.village)))
+        form.fields['transferSchools'].widget.choices = c
+    return render(request, "accounts/fillapp.html", {"selectedChoices": selectedChoices, "form": form, "pmsg": pmsg, "pemsg": pemsg, "msg": msg, "smsg": smsg, "success": app.is_submitted, 'uname': request.user.username})
 
 
 def register_user(request):

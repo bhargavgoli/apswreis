@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import School, Mandal, District, SchoolCategory
+from .models import School, Mandal, District, SchoolCategory, Designation, Vacancy
 # Register your models here
 
 
@@ -21,6 +21,16 @@ class SchoolAdmin(admin.ModelAdmin):
                     'mandal', 'pincode', 'category', 'created_at',)
 
 
+class VacancyAdmin(admin.ModelAdmin):
+    list_display = ('school', 'designation_name', 'employee')
+
+
+class DesignationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
+
+
+admin.site.register(Designation, DesignationAdmin)
+admin.site.register(Vacancy, VacancyAdmin)
 admin.site.register(District, DistrictAdmin)
 admin.site.register(Mandal, MandalAdmin)
 admin.site.register(School, SchoolAdmin)

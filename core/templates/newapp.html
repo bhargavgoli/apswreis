@@ -12,7 +12,7 @@
     <div class="card">
       <div class="card-header card-header-primary">
         <h4 class="card-title">
-          New Application
+          Add New Employee
         </h4>
       </div>
       <div class="card-body">
@@ -20,6 +20,10 @@
         <h6 class="card-category">
           {% if msg %}
           <span class="text-danger">{{ msg }}</span>
+          {% endif %}
+
+          {% if smsg %}
+          <span class="text-success">{{ smsg }}</span>
           {% endif %}
         </h6>
 
@@ -55,31 +59,48 @@
           <br />
 
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="form-group">
                 <label class="bmd-label-floating">Employee Code</label>
                 {{ form.employeeId }}
               </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="form-group">
                 <label class="bmd-label-floating">Phone No</label>
                 {{ form.phone }}
               </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="form-group">
                 <label class="bmd-label-floating">Date Of Joining</label>
                 {{ form.doj }}
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">Date Of Birth</label>
+                {{ form.dob }}
               </div>
             </div>
           </div>
 
           <br />
 
+
           <div class="row">
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">Select School</label>
+                {{ form.school }}
+              </div>
+            </div>
+
+
             <div class="col-md-3">
               <div class="form-group">
                 <label class="bmd-label-floating">Marital Status</label>
@@ -96,26 +117,16 @@
 
             <div class="col-md-3">
               <div class="form-group">
-                <label class="bmd-label-floating">Chronic Illness</label>
-                {{ form.chronicillness }}
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="form-group">
                 <label class="bmd-label-floating">Gender</label>
                 {{ form.gender }}
               </div>
             </div>
+
           </div>
 
           <br />
           <br />
-          <span class="text-danger">Note: Application cannot be modified, once it is submitted.</span>
-          <br />
-          <br />
           <button type="submit" name="save" class="btn btn-primary pull-left">SAVE</button>
-          <button type="submit" name="submit" class="btn btn-primary pull-left">SUBMIT</button>
 
           <!-- &nbsp; &nbsp;
           <span class="pull-right">

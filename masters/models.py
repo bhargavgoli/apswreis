@@ -38,6 +38,30 @@ class School(models.Model):
         return '{} - {} - {}'.format(self.school_name, self.village, self.village)
 
 
+class Designation(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now=True)
+
+    def _str_(self):
+        return self.name
+
+
+class Vacancy(models.Model):
+    school = models.ForeignKey(
+        'masters.School', related_name='vacancy_school', on_delete=models.DO_NOTHING)
+    designation = models.ForeignKey(
+        'masters.Designation', related_name='designation', on_delete=models.DO_NOTHING)
+    employee = models.ForeignKey(
+        'applications.Application', related_name='alloted_emp', on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} {} - {} {}'.format(self.employee.first_name, self.employee.last_name, self.school.school_name, self.designation.name)
+
+    def designation_name(self):
+        return self.designation.name
+
+
 class SchoolCategory(models.Model):
     name = models.CharField(max_length=100)
     point = models.IntegerField(default=0)
