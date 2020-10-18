@@ -11,6 +11,7 @@ class Application(models.Model):
     employee_id = models.CharField(max_length=100)
     phone_no = models.CharField(max_length=100)
     date_of_join = models.DateField(blank=True, null=True)
+    years_of_exp = models.IntegerField(default=0)
     marital_status = models.BooleanField(default=False)
     physical_disabled = models.BooleanField(default=False)
     chronic_illness = models.CharField(default=0, max_length=100)

@@ -84,6 +84,9 @@ def app_view(request):
                 user_ob = get_user_model()(username=app_ref)
                 user_ob.set_password("app_"+app_ref)
                 user_ob.save()
+                points = 0
+                # exp = datetime.strptime(doj, '%Y-%m-%d')
+
                 app = Application(
                     app_ref_no=app_ref,
                     first_name=firstName,
@@ -96,7 +99,8 @@ def app_view(request):
                     marital_status=maritalstatus,
                     physical_disabled=physical,
                     chronic_illness=chronicillness,
-                    created_by=user_ob
+                    created_by=user_ob,
+                    years_of_exp=0
                 )
                 app.save()
                 sendAppMail(email, '{} {}'.format(
