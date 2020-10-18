@@ -1,4 +1,41 @@
 
+<br />
+
+## How to use it
+
+```bash
+$ # Get the code
+$ git clone https://github.com/app-generator/django-dashboard-material.git
+$ cd django-dashboard-material
+$
+$ # Virtualenv modules installation (Unix based systems)
+$ virtualenv env
+$ source env/bin/activate
+$
+$ # Virtualenv modules installation (Windows based systems)
+$ # virtualenv env
+$ # .\env\Scripts\activate
+$
+$ # Install modules - SQLite Storage
+$ pip3 install -r requirements.txt
+$
+$ # Create tables
+$ python manage.py makemigrations
+$ python manage.py migrate
+$
+$ # Start the application (development mode)
+$ python manage.py runserver # default port 8000
+$
+$ # Start the app - custom port
+$ # python manage.py runserver 0.0.0.0:<your_port>
+$
+$ # Access the web app in browser: http://127.0.0.1:8000/
+```
+
+> Note: To use the app, please access the registration page and create a new user. After authentication, the app will unlock the private pages.
+
+<br />
+
 
 ## Deployment
 
@@ -69,13 +106,3 @@ Visit `http://localhost:8001` in your browser. The app should be up & running.
 
 <br />
 
-## Credits & Links
-
-- [Django](https://www.djangoproject.com/) - The official website
-- [Boilerplate Code](https://appseed.us/boilerplate-code) - Index provided by **AppSeed**
-- [Boilerplate Code](https://github.com/app-generator/boilerplate-code) - Index published on Github
-
-<br />
-
----
-[Django Dashboard Material](https://appseed.us/admin-dashboards/django-dashboard-material) - Provided by **AppSeed** [Web App Generator](https://appseed.us/app-generator).
