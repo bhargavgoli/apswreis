@@ -13,11 +13,41 @@ from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
-from .forms import ApplicationForm, SignUpForm, ExistApplicationForm
-from datetime import datetime
+from .forms import ApplicationForm, SignUpForm, ExistApplicationForm, LoginForm, ChoosePreferenceForm
+from datetime import datetime, timedelta, date
 from .sendmail import sendAppMail
 
-from applications.models import Application
+from applications.models import Application, TransferAllotment
+from masters.models import School, SchoolCategory
+
+
+def login_view(request):
+    form = LoginForm(request.POST or None)
+
+    msg = None
+
+    if request.method == "POST":
+
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect("/")
+            else:
+                msg = 'Invalid credentials'
+        else:
+            msg = 'Error validating the form'
+
+    return render(request, "accounts/login.html", {"form": form, "msg": msg})
+
+
+def calculateExp(doj):
+    today = date.today()
+    exp = today.year - doj.year - ((today.month, today.day) <
+                                   (doj.month, doj.day))
+    return exp
 
 
 def exist_app_view(request):
@@ -59,6 +89,109 @@ def exist_app_view(request):
     return render(request, "accounts/existapp.html", {"form": form, "msg": msg})
 
 
+def pref_app_view(request):
+    form = ExistApplicationForm(request.POST or None)
+    msg = None
+
+    if request.method == "POST":
+        app_ref_no = form["appRefNo"].value()
+        if(app_ref_no and not form.is_valid()):
+            try:
+                app = Application.objects.get(app_ref_no=app_ref_no)
+                if app.is_submitted:
+                    if app.years_of_exp >= 8:
+                        form.fields['appRefNo'].widget.attrs['readonly'] = True
+                        form.fields['otp'].widget.attrs['readonly'] = False
+                    else:
+                        msg = "You are not eligible to choose preference."
+                else:
+                    msg = "Application not submitted, please submit application to choose preference"
+            except Application.DoesNotExist:
+                msg = "Invalid Application reference No"
+        elif form.is_valid():
+            otp = form.cleaned_data.get('otp')
+            if otp == "1234":
+                user = authenticate(username=app_ref_no,
+                                    password="app_"+app_ref_no)
+                login(request, user)
+                return redirect('/choosepref')
+            else:
+                form.fields['appRefNo'].widget.attrs['readonly'] = True
+                form.fields['otp'].widget.attrs['readonly'] = False
+                msg = "Invalid OTP entered"
+        else:
+            msg = "Enter app reference no."
+        # return redirect('/fillapp')
+        # print(form)
+        # if form.is_valid():
+        #     msg = "valid"
+        # else:
+        #     msg = "Not valid"
+
+    return render(request, "accounts/pref.html", {"form": form, "msg": msg})
+
+
+def getUserEligibleSchools(user):
+    schools = []
+    try:
+        app = Application.objects.get(app_ref_no=user.username)
+        if app.chronic_illness != '0':
+            schools = School.objects.all()
+        else:
+            try:
+                category = SchoolCategory.objects.filter(point__lte=app.points)
+                schools = School.objects.filter(category__in=category)
+            except SchoolCategory.DoesNotExist:
+                pass
+    except Application.DoesNotExist:
+        pass
+    return schools
+
+
+@login_required(login_url='/existapp')
+def choose_pref_app_view(request):
+    form = ChoosePreferenceForm(request.POST or None)
+    msg = None
+    smsg = None
+    isEnabled = False
+    try:
+        app = Application.objects.get(app_ref_no=request.user.username)
+    except Application.DoesNotExist:
+        app = None
+
+    if request.method == "POST":
+        if form.is_valid() and app:
+            selected_school = form.cleaned_data.get('school')
+            try:
+                TransferAllotment.objects.get(application=app)
+                msg = "You alread saved your preference."
+            except TransferAllotment.DoesNotExist:
+                if app:
+                    allotment = TransferAllotment(
+                        application=app,
+                        points=app.points,
+                        school_id=selected_school)
+                    allotment.save()
+                    smsg = "Your preference has been saved."
+
+    try:
+        allot = TransferAllotment.objects.get(application=app)
+        c = []
+        school = School.objects.get(id=allot.school_id)
+        c.append((school.id, '{} - {}'.format(school.school_name, school.village)))
+        form.fields['school'].widget.choices = c
+        isEnabled = True
+        smsg = "You are already saved your preference."
+    except TransferAllotment.DoesNotExist:
+        choices = getUserEligibleSchools(request.user)
+        c = []
+        for choice in choices:
+            c.append(
+                (choice.id, '{} - {}'.format(choice.school_name, choice.village)))
+            form.fields['school'].widget.choices = c
+    return render(request, "accounts/choosepref.html", {"form": form, "msg": msg, "smsg": smsg, "isEnabled": isEnabled})
+
+
 def app_view(request):
     form = ApplicationForm(request.POST or None)
     print(form.errors)
@@ -85,8 +218,20 @@ def app_view(request):
                 user_ob.set_password("app_"+app_ref)
                 user_ob.save()
                 points = 0
-                # exp = datetime.strptime(doj, '%Y-%m-%d')
-
+                status = 'Pending'
+                date_doj = datetime.strptime(doj, '%Y-%m-%d')
+                expYrs = calculateExp(date_doj)
+                if expYrs >= 8:
+                    points = 1
+                    print('{} {}'.format(maritalstatus, gender))
+                    if maritalstatus == '0' and gender == '2':
+                        points += 5
+                    if physical == '1':
+                        points += 10
+                    if chronicillness != '0':
+                        points += 1000  # This points is consider as the user can choose any location
+                else:
+                    status = 'NotEligible'
                 app = Application(
                     app_ref_no=app_ref,
                     first_name=firstName,
@@ -100,13 +245,15 @@ def app_view(request):
                     physical_disabled=physical,
                     chronic_illness=chronicillness,
                     created_by=user_ob,
-                    years_of_exp=0
+                    years_of_exp=expYrs,
+                    status=status,
+                    points=points
                 )
                 app.save()
-                sendAppMail(email, '{} {}'.format(
-                    firstName, lastName), app_ref)
+                # sendAppMail(email, '{} {}'.format(
+                #     firstName, lastName), app_ref)
                 msg = 'Application Submitted/Saved Successfully'
-                form = ApplicationForm()
+                # form = ApplicationForm()
         else:
             msg = 'Error validating the form'
 
@@ -132,8 +279,22 @@ def fill_app(request):
             physical = form.cleaned_data.get("physical")
             chronicillness = form.cleaned_data.get("chronicillness")
             email = form.cleaned_data.get("email")
-
+            status = 'Pending'
+            points = 0
             try:
+                date_doj = datetime.strptime(doj, '%Y-%m-%d')
+                expYrs = calculateExp(date_doj)
+                if expYrs >= 8:
+                    points = 1
+                    print('{} {}'.format(maritalstatus, gender))
+                    if maritalstatus == '0' and gender == '2':
+                        points += 5
+                    if physical == '1':
+                        points += 10
+                    if chronicillness != '0':
+                        points += 1000  # This points is consider as the user can choose any location
+                else:
+                    status = 'NotEligible'
                 app = Application.objects.get(
                     app_ref_no=request.user.username)
                 app.first_name = firstName
@@ -145,6 +306,8 @@ def fill_app(request):
                 app.marital_status = True if maritalstatus == '1' else False
                 app.physical_disabled = True if physical == '1' else False
                 app.chronic_illness = chronicillness
+                app.points = points
+                app.status = status
                 app.is_submitted = True
                 app.save()
                 msg = "Application alredy submitted"

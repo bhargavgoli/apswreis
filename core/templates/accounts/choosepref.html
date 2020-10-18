@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Application {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">
+          Choose Transfer Preference
+        </h4>
+      </div>
+      <div class="card-body">
+
+        <h6 class="card-category">
+          {% if msg %}
+          <span class="text-danger">{{ msg }}</span>
+          {% endif %}
+          {% if smsg %}
+          <span class="text-success">{{ smsg }}</span>
+          {% endif %}
+        </h6>
+
+        <br />
+
+        <form role="form" method="post" action="">
+
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Select School:</label>
+                {{ form.school }}
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" name="submit" class="btn btn-primary pull-left" disabled={{isEnabled}}>Save</button>
+
+
+          <!-- &nbsp; &nbsp;
+          <span class="pull-right">
+            Don't have an account? <a href="{% url 'existapp' %}" class="text-primary">Create</a>
+          </span> -->
+
+          <div class="clearfix"></div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

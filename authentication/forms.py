@@ -8,6 +8,23 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 
+class LoginForm(forms.Form):
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Username",
+                "class": "form-control"
+            }
+        ))
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Password",
+                "class": "form-control"
+            }
+        ))
+
+
 class ApplicationForm(forms.Form):
     firstname = forms.CharField(
         widget=forms.TextInput(
@@ -161,3 +178,14 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('firstname', 'lastname', 'username',
                   'email', 'password1', 'password2')
+
+
+class ChoosePreferenceForm(forms.Form):
+    school = forms.IntegerField(
+        widget=forms.Select(
+            choices=[],
+            attrs={
+                "placeholder": "Select Your Prefernce",
+                "class": "form-control"
+            }
+        ))

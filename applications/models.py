@@ -3,6 +3,17 @@ from django.contrib.auth import get_user_model
 # Create your models here.
 
 
+def getChornic(id):
+    illness = {
+        "0": "Not Applicable",
+        "1": "Cancer",
+        "2": "Kidney",
+        "3": "Thalassemia",
+        "4": "Others"
+    }
+    return illness[id]
+
+
 class Application(models.Model):
     app_ref_no = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
@@ -25,6 +36,18 @@ class Application(models.Model):
 
     def __str__(self):
         return '{} - {} {}'.format(self.app_ref_no, self.first_name, self.last_name)
+
+    def marital(self):
+        return 'Married' if self.marital_status else 'Single'
+
+    def physical_disability(self):
+        return 'Yes' if self.physical_disabled else 'No'
+
+    def ChronicIllness(self):
+        return getChornic(self.chronic_illness)
+
+    def user_gender(self):
+        return 'Male' if self.gender == '1' else 'Female'
 
 
 class TransferAllotment(models.Model):

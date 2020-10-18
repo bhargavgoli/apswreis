@@ -35,7 +35,7 @@ class School(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.school_name
+        return '{} - {} - {}'.format(self.school_name, self.village, self.village)
 
 
 class SchoolCategory(models.Model):
